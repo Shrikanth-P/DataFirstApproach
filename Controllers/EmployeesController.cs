@@ -6,15 +6,21 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using DataFirstApproach.Models;
+using NToastNotify;
+using Microsoft.Extensions.Logging;
 
 namespace DataFirstApproach.Controllers
 {
     public class EmployeesController : Controller
     {
         private readonly trainingContext _context;
+        private readonly ILogger<EmployeesController> _logger;
+        private readonly IToastNotification _toastNotification;
 
-        public EmployeesController(trainingContext context)
+        public EmployeesController(trainingContext context, IToastNotification toastNotification, ILogger<EmployeesController> logger)
         {
+            _logger = _logger;
+            _toastNotification = toastNotification;
             _context = context;
         }
 
@@ -59,6 +65,7 @@ namespace DataFirstApproach.Controllers
             {
                 _context.Add(employee);
                 await _context.SaveChangesAsync();
+                _toastNotification.AddSuccessToastMessage("Employee created successfully");
                 return RedirectToAction(nameof(Index));
             }
             return View(employee);
@@ -98,6 +105,7 @@ namespace DataFirstApproach.Controllers
                 {
                     _context.Update(employee);
                     await _context.SaveChangesAsync();
+                    _toastNotification.AddWarningToastMessage("Employee updated successfully");
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -149,6 +157,7 @@ namespace DataFirstApproach.Controllers
             }
             
             await _context.SaveChangesAsync();
+            _toastNotification.AddErrorToastMessage("Employee deleted successfully");
             return RedirectToAction(nameof(Index));
         }
 
